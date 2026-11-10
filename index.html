@@ -100,8 +100,11 @@ kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:.3em;padd
 
 /* 분류 */
 .pool{display:flex;flex-wrap:wrap;gap:.5em;min-height:2.6em}
-.chip{background:var(--card);border:1.5px solid var(--ink);border-radius:2em;padding:.25em .95em;font-weight:700}
-.chip.sel{background:var(--gold);border-color:var(--gold);color:#fff}
+.chip{background:var(--card);border:1.5px solid var(--ink);border-radius:2em;padding:.25em .95em;font-weight:700;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.chip.drag{position:relative;z-index:50;pointer-events:none;cursor:grabbing;box-shadow:0 .4em 1em rgba(0,0,0,.28);background:var(--gold);border-color:var(--gold);color:#fff}
+#pool{border:2px dashed transparent;border-radius:.7em;padding:.3em}
+#pool.over{border-color:var(--gold)}
+.bin.over{border-style:solid;box-shadow:0 0 0 4px rgba(185,138,43,.45)}
 .chip.right{border-color:var(--ok);background:var(--ok-bg)} .chip.wrong{border-color:var(--no);background:var(--no-bg)}
 .bins{display:grid;grid-template-columns:1fr 1fr;gap:.8em}
 .bin{border:2px dashed var(--line);border-radius:.7em;padding:.8em;min-height:7.5em;text-align:left;background:transparent;display:block;width:100%}
@@ -264,11 +267,11 @@ kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:.3em;padd
     <div class="inner">
       <p class="kicker">활동 · 누가 누구와 싸웠을까?</p>
       <h2>연합국과 추축국으로 나누어 보자</h2>
-      <p class="lead">나라를 누른 다음, 넣을 칸을 누르세요. (칸 안의 나라를 누르면 다시 꺼낼 수 있어요.)</p>
+      <p class="lead">나라 이름을 끌어서 알맞은 칸에 놓으세요. (잘못 넣은 나라는 다시 끌어서 옮길 수 있어요.)</p>
       <div class="pool" id="pool"></div>
       <div class="bins">
-        <div class="bin axis" data-bin="axis" role="button" tabindex="0"><h3>추축국</h3><div class="pool"></div></div>
-        <div class="bin allied" data-bin="allied" role="button" tabindex="0"><h3>연합국</h3><div class="pool"></div></div>
+        <div class="bin axis" data-bin="axis"><h3>추축국</h3><div class="pool"></div></div>
+        <div class="bin allied" data-bin="allied"><h3>연합국</h3><div class="pool"></div></div>
       </div>
       <div class="row"><button class="btn" id="binCheck">확인</button><button class="btn ghost" id="binReset">다시</button><span class="msg" id="binMsg"></span></div>
     </div>
@@ -434,34 +437,55 @@ kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:.3em;padd
 
   /* ---------- 두 진영 ---------- */
   var NATIONS = [['독일','axis'],['이탈리아','axis'],['일본','axis'],['영국','allied'],['프랑스','allied'],['미국','allied'],['소련','allied'],['중국','allied']];
-  var pool = $('#pool'), selected = null;
+  var pool = $('#pool'), drag = null;
+  function zoneAt(x, y){
+    var t = document.elementFromPoint(x, y); if (!t || !t.closest) return null;
+    return t.closest('.bin') || t.closest('#pool');
+  }
+  function clearOver(){ $$('.over').forEach(function(z){ z.classList.remove('over'); }); }
+  function onDragMove(e){
+    if (!drag || e.pointerId !== drag.id) return;
+    var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (!drag.moved && Math.abs(dx) + Math.abs(dy) < 6) return;
+    drag.moved = true; e.preventDefault();
+    drag.chip.classList.add('drag');
+    drag.chip.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(1.08)';
+    clearOver(); var z = zoneAt(e.clientX, e.clientY); if (z) z.classList.add('over');
+  }
+  function onDragEnd(e){
+    if (!drag || e.pointerId !== drag.id) return;
+    var c = drag.chip, moved = drag.moved;
+    var z = (moved && e.type === 'pointerup') ? zoneAt(e.clientX, e.clientY) : null;
+    document.removeEventListener('pointermove', onDragMove);
+    document.removeEventListener('pointerup', onDragEnd);
+    document.removeEventListener('pointercancel', onDragEnd);
+    drag = null; c.classList.remove('drag'); c.style.transform = ''; clearOver();
+    if (!z) return;
+    c.classList.remove('right', 'wrong');
+    (z === pool ? pool : $('.pool', z)).appendChild(c);
+  }
   function buildBins(){
     pool.innerHTML = ''; $$('.bin .pool').forEach(function(p){ p.innerHTML = ''; });
-    $('#binMsg').textContent = ''; $('#binMsg').className = 'msg'; selected = null;
+    $('#binMsg').textContent = ''; $('#binMsg').className = 'msg';
     shuffle(NATIONS).forEach(function(n){
-      var c = el('button', 'chip', n[0]); c.dataset.side = n[1];
-      c.addEventListener('click', function(ev){
-        ev.stopPropagation();
-        c.classList.remove('right', 'wrong');
-        if (c.parentNode !== pool) { pool.appendChild(c); return; }
-        if (selected) selected.classList.remove('sel');
-        selected = (selected === c) ? null : c;
-        if (selected) c.classList.add('sel');
+      var c = el('div', 'chip', n[0]); c.dataset.side = n[1];
+      c.addEventListener('pointerdown', function(e){
+        if (drag || (e.pointerType === 'mouse' && e.button !== 0)) return;
+        e.preventDefault();
+        drag = { chip: c, id: e.pointerId, x: e.clientX, y: e.clientY, moved: false };
+        document.addEventListener('pointermove', onDragMove, { passive: false });
+        document.addEventListener('pointerup', onDragEnd);
+        document.addEventListener('pointercancel', onDragEnd);
       });
       pool.appendChild(c);
     });
   }
-  $$('.bin').forEach(function(bin){
-    function drop(){ if (!selected) return; selected.classList.remove('sel'); $('.pool', bin).appendChild(selected); selected = null; }
-    bin.addEventListener('click', drop);
-    bin.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); drop(); } });
-  });
   $('#binCheck').addEventListener('click', function(){
     var m = $('#binMsg');
     if ($$('.chip', pool).length) { m.textContent = '아직 넣지 않은 나라가 있어요.'; m.className = 'msg no'; return; }
     var wrong = 0;
     $$('.bin').forEach(function(bin){ $$('.chip', bin).forEach(function(c){ var ok = c.dataset.side === bin.dataset.bin; c.classList.toggle('right', ok); c.classList.toggle('wrong', !ok); if (!ok) wrong++; }); });
-    if (wrong) { m.textContent = wrong + '개가 틀렸어요. 빨간 나라를 눌러 꺼낸 뒤 다시 넣어 보세요.'; m.className = 'msg no'; }
+    if (wrong) { m.textContent = wrong + '개가 틀렸어요. 빨간 나라를 다른 칸으로 끌어서 옮겨 보세요.'; m.className = 'msg no'; }
     else { m.textContent = '정답! 추축국: 독일·이탈리아·일본 / 연합국: 영국·프랑스·미국·소련·중국 등'; m.className = 'msg ok'; }
   });
   $('#binReset').addEventListener('click', buildBins);
