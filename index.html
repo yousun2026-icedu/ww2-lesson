@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>제2차 세계 대전의 발발 ① | 중학교 역사1</title>
+<meta name="description" content="중학교 역사1 Ⅵ-1-5 제2차 세계 대전의 발발 ① 수업용 인터랙티브 자료">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f4eee2; --paper-2:#ebe3d3; --card:#fffdf8; --ink:#1f2430; --ink-2:#555c6b; --line:#d6ccb8;
+  --accent:#b8402a; --allied:#2b5f9e; --allied-bg:#e3ecf7; --axis:#8f2d2d; --axis-bg:#f6e3df;
+  --gold:#b98a2b; --ok:#2e7d4f; --ok-bg:#e2f2e7; --no:#b3372b; --no-bg:#fae4e0;
+  --sans:'Noto Sans KR','Pretendard','Malgun Gothic','Apple SD Gothic Neo',sans-serif;
+  --serif:'Gowun Batang','Nanum Myeongjo','Batang',serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{
+  background:var(--paper);color:var(--ink);font-family:var(--sans);
+  font-size:clamp(16px,1.25vw + 8px,26px);line-height:1.6;
+  display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden;
+  word-break:keep-all;overflow-wrap:anywhere;
+}
+button{font:inherit;color:inherit;cursor:pointer}
+h1,h2,h3,p{margin:0}
+
+/* 상단 */
+.top{display:flex;align-items:center;gap:.8em;padding:.5em 1.2em;border-bottom:1px solid var(--line);font-size:.7em;color:var(--ink-2);flex:none}
+.top .unit{font-weight:700;color:var(--accent);white-space:nowrap}
+.top .where{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dots{display:flex;gap:.35em;flex:none}
+.dots button{width:.8em;height:.8em;border-radius:50%;border:1px solid var(--ink-2);background:transparent;padding:0}
+.dots button.on{background:var(--accent);border-color:var(--accent)}
+.dots button.done{background:var(--ink-2)}
+
+/* 슬라이드 */
+main{flex:1;min-height:0;position:relative}
+.slide{position:absolute;inset:0;overflow-y:auto;padding:clamp(16px,3vw,48px) clamp(16px,5vw,90px);display:none}
+.slide.on{display:block;animation:in .35s ease}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.inner{max-width:1280px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;justify-content:center;gap:1em}
+.kicker{font-size:.72em;font-weight:700;letter-spacing:.12em;color:var(--accent)}
+h2{font-family:var(--serif);font-size:1.75em;line-height:1.3;font-weight:700}
+.lead{color:var(--ink-2);font-size:.95em}
+.card{background:var(--card);border:1px solid var(--line);border-radius:.7em;padding:1em 1.2em}
+.btn{background:var(--ink);color:#fff;border:0;border-radius:.5em;padding:.5em 1.1em;font-weight:700;font-size:.85em}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
+.btn:disabled{opacity:.35;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:.6em;align-items:center}
+.msg{font-weight:700;font-size:.9em;min-height:1.6em}
+.msg.ok{color:var(--ok)} .msg.no{color:var(--no)}
+
+/* 표지 */
+.cover .inner{align-items:flex-start}
+.cover h1{font-family:var(--serif);font-size:clamp(2.2em,6vw,4.4em);line-height:1.15;font-weight:700}
+.cover h1 em{font-style:normal;color:var(--accent)}
+.cover .years{font-family:var(--serif);font-size:1.5em;color:var(--ink-2);letter-spacing:.1em}
+.goals{list-style:none;margin:0;padding:0;display:grid;gap:.5em}
+.goals li{display:flex;gap:.6em;align-items:baseline}
+.goals li::before{content:"✓";color:var(--accent);font-weight:900}
+.hint{font-size:.7em;color:var(--ink-2)}
+kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:.3em;padding:0 .4em;background:var(--card);font-family:inherit}
+
+/* 뒤집기 카드 */
+.flips{display:grid;grid-template-columns:repeat(3,1fr);gap:.8em}
+.flip{background:var(--card);border:1.5px solid var(--line);border-radius:.7em;padding:1em;text-align:center;min-height:8.5em;display:flex;flex-direction:column;justify-content:center;gap:.3em}
+.flip .nation{font-family:var(--serif);font-size:1.4em;font-weight:700}
+.flip .q{color:var(--ink-2);font-size:.8em}
+.flip .a{display:none;font-weight:700;color:var(--axis)}
+.flip .a small{display:block;font-weight:400;color:var(--ink-2);font-size:.8em}
+.flip.open{border-color:var(--axis);background:var(--axis-bg)}
+.flip.open .a{display:block} .flip.open .q{display:none}
+
+/* 선택지 */
+.choices{display:grid;gap:.6em}
+.choice{text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:.6em;padding:.7em 1em;display:flex;gap:.7em;align-items:baseline}
+.choice b{color:var(--accent)}
+.choice.right{border-color:var(--ok);background:var(--ok-bg)}
+.choice.wrong{border-color:var(--no);background:var(--no-bg)}
+.explain{display:none;border-left:4px solid var(--gold);padding:.4em 0 .4em 1em}
+.explain.show{display:block}
+.handshake{display:flex;align-items:center;justify-content:center;gap:1em;font-family:var(--serif);font-size:1.3em;font-weight:700}
+.handshake span{padding:.3em .9em;border-radius:.4em}
+.handshake .g{background:var(--axis-bg);color:var(--axis)} .handshake .s{background:var(--allied-bg);color:var(--allied)}
+.handshake small{display:block;font-family:var(--sans);font-size:.55em;font-weight:500}
+
+/* 흐름 */
+.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:.7em;counter-reset:f}
+.flow .step{background:var(--card);border:1.5px solid var(--line);border-radius:.7em;padding:.9em;position:relative;opacity:.12;transition:opacity .4s,transform .4s;transform:translateY(6px)}
+.flow .step.shown{opacity:1;transform:none}
+.flow .step::before{counter-increment:f;content:counter(f);display:inline-grid;place-items:center;width:1.7em;height:1.7em;border-radius:50%;background:var(--ink);color:#fff;font-weight:700;font-size:.8em;margin-bottom:.4em}
+.flow .step .when{font-size:.75em;color:var(--accent);font-weight:700;margin-left:.4em}
+.flow .step h3{font-size:1.02em;line-height:1.35}
+.flow .step p{font-size:.8em;color:var(--ink-2);margin-top:.3em}
+.flow .step.war{border-color:var(--accent);background:var(--axis-bg)}
+.flow .step.war::before{background:var(--accent)}
+
+/* 분류 */
+.pool{display:flex;flex-wrap:wrap;gap:.5em;min-height:2.6em}
+.chip{background:var(--card);border:1.5px solid var(--ink);border-radius:2em;padding:.25em .95em;font-weight:700}
+.chip.sel{background:var(--gold);border-color:var(--gold);color:#fff}
+.chip.right{border-color:var(--ok);background:var(--ok-bg)} .chip.wrong{border-color:var(--no);background:var(--no-bg)}
+.bins{display:grid;grid-template-columns:1fr 1fr;gap:.8em}
+.bin{border:2px dashed var(--line);border-radius:.7em;padding:.8em;min-height:7.5em;text-align:left;background:transparent;display:block;width:100%}
+.bin h3{font-size:1em;margin-bottom:.5em}
+.bin.allied{border-color:var(--allied);background:var(--allied-bg)} .bin.allied h3{color:var(--allied)}
+.bin.axis{border-color:var(--axis);background:var(--axis-bg)} .bin.axis h3{color:var(--axis)}
+
+/* 연표 */
+.years-bar{display:grid;grid-template-columns:repeat(7,1fr);gap:.3em}
+.years-bar button{background:var(--card);border:1.5px solid var(--line);border-radius:.5em;padding:.35em 0;font-family:var(--serif);font-weight:700;font-size:1.05em}
+.years-bar button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.gauge{height:1.5em;border-radius:1em;overflow:hidden;display:flex;font-size:.65em;font-weight:700;color:#fff;border:1px solid var(--line)}
+.gauge .ax{background:var(--axis);display:flex;align-items:center;padding-left:.8em;transition:flex-basis .6s;white-space:nowrap;overflow:hidden}
+.gauge .al{background:var(--allied);flex:1;display:flex;align-items:center;justify-content:flex-end;padding-right:.8em;white-space:nowrap;overflow:hidden}
+.phase{font-weight:700;font-size:.9em}
+.events{display:grid;grid-template-columns:repeat(auto-fit,minmax(15em,1fr));gap:.7em}
+.ev{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--ink-2);border-radius:.5em;padding:.7em .9em}
+.ev.eu{border-left-color:var(--allied)} .ev.pa{border-left-color:var(--gold)}
+.ev .tag{font-size:.65em;font-weight:700;color:var(--ink-2);letter-spacing:.05em}
+.ev h3{font-size:1em;line-height:1.35}
+.ev p{font-size:.8em;color:var(--ink-2);margin-top:.2em}
+.ev.key{box-shadow:0 0 0 2px var(--accent) inset}
+
+/* 순서 */
+.order{display:grid;grid-template-columns:repeat(3,1fr);gap:.7em}
+.ocard{background:var(--card);border:1.5px solid var(--line);border-radius:.7em;padding:.8em .9em .8em 3.2em;text-align:left;position:relative;font-weight:700;min-height:4.6em;line-height:1.4}
+.ocard .n{position:absolute;left:.7em;top:50%;transform:translateY(-50%);width:1.9em;height:1.9em;border-radius:50%;border:2px dashed var(--line);display:grid;place-items:center;font-family:var(--serif)}
+.ocard.picked{border-color:var(--ink)} .ocard.picked .n{border:0;background:var(--ink);color:#fff}
+.ocard.right{border-color:var(--ok);background:var(--ok-bg)} .ocard.right .n{background:var(--ok)}
+.ocard.wrong{border-color:var(--no);background:var(--no-bg)} .ocard.wrong .n{background:var(--no)}
+.ocard small{display:none;font-weight:500;color:var(--ink-2)}
+.order.checked .ocard small{display:block}
+
+/* OX */
+.ox-q{font-family:var(--serif);font-size:1.45em;font-weight:700;line-height:1.45;min-height:3em}
+.ox-btns{display:flex;gap:1em}
+.ox-btns button{flex:1;font-size:2.6em;font-weight:900;border-radius:.3em;border:3px solid;background:var(--card);padding:.1em 0;line-height:1.3}
+.ox-btns .o{color:var(--allied);border-color:var(--allied)} .ox-btns .x{color:var(--no);border-color:var(--no)}
+.ox-btns button.picked.o{background:var(--allied);color:#fff} .ox-btns button.picked.x{background:var(--no);color:#fff}
+.ox-fb{display:none} .ox-fb.show{display:block}
+.ox-fb.ok{border-color:var(--ok);background:var(--ok-bg)} .ox-fb.no{border-color:var(--no);background:var(--no-bg)}
+
+/* 정리 */
+.note{display:grid;gap:.55em}
+.note h3{font-size:.95em;color:var(--accent);margin-top:.3em}
+.note p{padding-left:1em;text-indent:-1em}
+.blank{display:inline-block;min-width:4.5em;border:0;border-bottom:2.5px solid var(--ink);background:var(--paper-2);color:transparent;font-weight:700;padding:0 .4em;text-indent:0;text-align:center;border-radius:.25em .25em 0 0;line-height:1.45}
+.blank.open{color:var(--accent);background:transparent}
+.qa{display:grid;gap:.6em}
+.qa button{text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:.6em;padding:.7em 1em;display:grid;gap:.2em}
+.qa .ans{display:none;color:var(--accent);font-weight:700}
+.qa button.open .ans{display:block}
+.think{font-family:var(--serif);font-size:1.3em;line-height:1.6;border-left:5px solid var(--accent);padding-left:.9em}
+
+/* 하단 */
+.nav{display:flex;align-items:center;gap:.6em;padding:.5em 1.2em;border-top:1px solid var(--line);font-size:.8em;flex:none}
+.nav .sp{flex:1}
+.nav .count{font-family:var(--serif);font-weight:700;min-width:4em;text-align:center}
+.timer{display:flex;align-items:center;gap:.3em}
+.timer button{background:transparent;border:1px solid var(--line);border-radius:.4em;padding:.2em .6em;font-size:.85em}
+.timer output{font-family:var(--serif);font-weight:700;min-width:3.2em;text-align:center}
+.timer.end output{color:var(--no);animation:blink .6s step-end infinite}
+@keyframes blink{50%{opacity:.2}}
+
+@media (max-width:760px){
+  .flips,.flow,.order{grid-template-columns:1fr}
+  .bins{grid-template-columns:1fr}
+  .top .where{display:none}
+  .timer .t-set{display:none}
+  .ox-q{font-size:1.2em}
+  .years-bar{gap:.15em}
+  .years-bar button{font-size:.85em;padding:.5em 0;min-width:0}
+  h2{font-size:1.4em}
+  .nav{padding:.5em .7em}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <span class="unit">Ⅵ-1-5</span>
+  <span class="where" id="where"></span>
+  <nav class="dots" id="dots" aria-label="슬라이드 이동"></nav>
+</header>
+
+<main id="deck">
+
+  <!-- 1 표지 -->
+  <section class="slide cover" data-title="표지">
+    <div class="inner">
+      <p class="kicker">Ⅵ. 세계 대전과 사회 변동 · 교과서 194~195쪽</p>
+      <h1>제2차 세계 대전의 <em>발발</em> ①</h1>
+      <p class="years">1939 — 1945</p>
+      <div class="card">
+        <p class="kicker" style="margin-bottom:.5em">학습 목표</p>
+        <ul class="goals">
+          <li>제2차 세계 대전의 원인을 설명할 수 있다.</li>
+          <li>제2차 세계 대전의 전개 과정을 정리할 수 있다.</li>
+        </ul>
+      </div>
+      <p class="hint">이동: <kbd>←</kbd> <kbd>→</kbd> 또는 아래 버튼 · 전체 화면: <kbd>F</kbd></p>
+    </div>
+  </section>
+
+  <!-- 2 복습 -->
+  <section class="slide" data-title="지난 시간 떠올리기">
+    <div class="inner">
+      <p class="kicker">지난 시간 떠올리기</p>
+      <h2>대공황 이후, 세 나라에서는 어떤 일이 벌어졌나요?</h2>
+      <p class="lead">카드를 눌러 확인해 보세요.</p>
+      <div class="flips">
+        <button class="flip"><span class="nation">독일</span><span class="q">누가, 어떤 체제를?</span><span class="a">히틀러 · 나치즘<small>게르만 민족 우월주의, 유대인 박해</small></span></button>
+        <button class="flip"><span class="nation">이탈리아</span><span class="q">누가, 어떤 체제를?</span><span class="a">무솔리니 · 파시즘<small>파시스트당의 일당 독재</small></span></button>
+        <button class="flip"><span class="nation">일본</span><span class="q">어떤 체제를?</span><span class="a">군국주의<small>군부가 정권 장악, 대륙 침략</small></span></button>
+      </div>
+      <div class="card">
+        세 나라의 공통점: 국가와 민족을 개인보다 앞세우는
+        <button class="blank" data-a="전체주의">전체주의</button> →
+        대외 <button class="blank" data-a="침략">침략</button>으로 위기를 해결하려 함
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 생각 열기 -->
+  <section class="slide" data-title="생각 열기">
+    <div class="inner">
+      <p class="kicker">생각 열기 · 1939년 8월</p>
+      <h2>원수 같던 두 나라가 갑자기 손을 잡았다?</h2>
+      <div class="handshake">
+        <span class="g">독일<small>나치즘 · 히틀러</small></span>🤝<span class="s">소련<small>사회주의 · 스탈린</small></span>
+      </div>
+      <p class="lead">사상적으로 대립하던 독일과 소련이 서로 침략하지 않겠다는 <b>독소 불가침 조약</b>을 맺어 세계를 놀라게 했습니다. 독일은 왜 그랬을까요?</p>
+      <div class="choices" id="poll">
+        <button class="choice" data-ok="0"><b>①</b> 히틀러가 사회주의 사상에 공감하게 되어서</button>
+        <button class="choice" data-ok="1"><b>②</b> 폴란드를 침공할 때 소련과 싸우는 일을 피하려고</button>
+        <button class="choice" data-ok="0"><b>③</b> 소련과 힘을 합쳐 미국을 공격하려고</button>
+      </div>
+      <p class="explain" id="pollEx">독일은 폴란드를 공격할 때 서쪽(영국·프랑스)과 동쪽(소련) 양쪽에서 동시에 싸우는 상황을 피하고 싶었습니다. 조약을 맺은 지 약 일주일 뒤, 독일은 폴란드를 침공합니다.</p>
+    </div>
+  </section>
+
+  <!-- 4 발발 -->
+  <section class="slide" data-title="1. 전쟁의 발발">
+    <div class="inner">
+      <p class="kicker">1. 제2차 세계 대전의 발발</p>
+      <h2>전쟁은 어떻게 시작되었을까?</h2>
+      <div class="flow">
+        <div class="step"><span class="when">1938</span><h3>독일, 오스트리아 합병</h3><p>같은 게르만 민족이라는 명분을 내세움</p></div>
+        <div class="step"><span class="when">1938</span><h3>추가 영토 요구 → 영국·프랑스의 협상</h3><p>전쟁을 피하려던 영국과 프랑스가 독일의 요구를 들어줌</p></div>
+        <div class="step"><span class="when">1939. 8.</span><h3>독소 불가침 조약 체결</h3><p>독일과 소련이 서로 침략하지 않기로 약속</p></div>
+        <div class="step war"><span class="when">1939. 9.</span><h3>독일, 폴란드 기습 공격</h3><p>영국·프랑스가 독일에 선전 포고 → <b>제2차 세계 대전 시작</b></p></div>
+      </div>
+      <div class="row"><button class="btn" id="flowBtn">다음 단계 ▶</button><span class="hint">→ 키를 눌러도 한 단계씩 나타납니다.</span></div>
+    </div>
+  </section>
+
+  <!-- 5 두 진영 -->
+  <section class="slide" data-title="두 진영">
+    <div class="inner">
+      <p class="kicker">활동 · 누가 누구와 싸웠을까?</p>
+      <h2>연합국과 추축국으로 나누어 보자</h2>
+      <p class="lead">나라를 누른 다음, 넣을 칸을 누르세요. (칸 안의 나라를 누르면 다시 꺼낼 수 있어요.)</p>
+      <div class="pool" id="pool"></div>
+      <div class="bins">
+        <div class="bin axis" data-bin="axis" role="button" tabindex="0"><h3>추축국</h3><div class="pool"></div></div>
+        <div class="bin allied" data-bin="allied" role="button" tabindex="0"><h3>연합국</h3><div class="pool"></div></div>
+      </div>
+      <div class="row"><button class="btn" id="binCheck">확인</button><button class="btn ghost" id="binReset">다시</button><span class="msg" id="binMsg"></span></div>
+    </div>
+  </section>
+
+  <!-- 6 연표 -->
+  <section class="slide" data-title="2~3. 전개와 종결">
+    <div class="inner" style="justify-content:flex-start">
+      <p class="kicker">2. 전개 · 3. 종결</p>
+      <h2>연도를 눌러 전쟁의 흐름을 따라가 보자</h2>
+      <div class="years-bar" id="yearsBar"></div>
+      <div class="gauge" aria-hidden="true"><div class="ax" id="gAx">추축국</div><div class="al">연합국</div></div>
+      <p class="phase" id="phase"></p>
+      <div class="events" id="events"></div>
+      <p class="hint">막대는 전세의 흐름을 단순하게 나타낸 개념도입니다. · <span style="color:var(--allied)">■</span> 유럽 <span style="color:var(--gold)">■</span> 아시아·태평양</p>
+    </div>
+  </section>
+
+  <!-- 7 순서 -->
+  <section class="slide" data-title="활동 1. 순서 맞추기">
+    <div class="inner">
+      <p class="kicker">활동 1</p>
+      <h2>일어난 순서대로 눌러 보자</h2>
+      <div class="order" id="order"></div>
+      <div class="row"><button class="btn" id="orderCheck">확인</button><button class="btn ghost" id="orderReset">다시 섞기</button><span class="msg" id="orderMsg"></span></div>
+    </div>
+  </section>
+
+  <!-- 8 OX -->
+  <section class="slide" data-title="활동 2. O/X 퀴즈">
+    <div class="inner">
+      <p class="kicker">활동 2 · O/X 퀴즈 <span id="oxNo"></span></p>
+      <p class="ox-q" id="oxQ"></p>
+      <div class="ox-btns"><button class="o" id="oxO" aria-label="O">O</button><button class="x" id="oxX" aria-label="X">X</button></div>
+      <div class="card ox-fb" id="oxFb"></div>
+      <div class="row"><button class="btn" id="oxNext" disabled>다음 문제 ▶</button><span class="msg" id="oxScore"></span></div>
+    </div>
+  </section>
+
+  <!-- 9 정리 -->
+  <section class="slide" data-title="정리하기">
+    <div class="inner" style="justify-content:flex-start">
+      <p class="kicker">정리하기</p>
+      <h2>빈칸을 채우며 오늘 배운 내용을 정리해 보자</h2>
+      <div class="card note" id="note">
+        <h3>1. 발발</h3>
+        <p>· 독일이 <button class="blank">오스트리아</button>를 합병하고 추가 영토 요구 → 영국·프랑스가 독일과 협상</p>
+        <p>· 독일이 소련과 <button class="blank">독소 불가침 조약</button> 체결 → <button class="blank">폴란드</button> 기습 공격(1939)</p>
+        <h3>2. 전개</h3>
+        <p>· 프랑스: 파리 함락 → <button class="blank">드골</button>이 영국에서 임시 정부를 세우고 저항 / 영국: 총리 <button class="blank">처칠</button> 중심으로 저항</p>
+        <p>· 독일이 조약을 파기하고 <button class="blank">소련</button> 공격 / 일본이 하와이 <button class="blank">진주만</button> 기습(1941) → <button class="blank">태평양 전쟁</button>, 미국 참전</p>
+        <h3>3. 종결</h3>
+        <p>· 전세 변화: <button class="blank">미드웨이</button> 해전(미국 승리), <button class="blank">스탈린그라드</button> 전투(소련 승리) → 이탈리아 항복(1943)</p>
+        <p>· <button class="blank">노르망디</button> 상륙 작전(1944) → 파리 해방 → 독일 항복 → 일본에 <button class="blank">원자 폭탄</button> 투하, 소련 참전 → 일본 항복(1945)</p>
+      </div>
+      <div class="row"><button class="btn" id="noteAll">모두 보기</button><button class="btn ghost" id="noteHide">모두 가리기</button></div>
+    </div>
+  </section>
+
+  <!-- 10 확인 문제 -->
+  <section class="slide" data-title="확인 문제">
+    <div class="inner">
+      <p class="kicker">확인 문제</p>
+      <h2>답을 말해 본 뒤, 눌러서 확인해 보자</h2>
+      <div class="qa">
+        <button><span>1. 독일이 파리를 점령하자 영국으로 건너가 임시 정부를 세우고 저항한 인물은?</span><span class="ans">→ 드골</span></button>
+        <button><span>2. 1941년 일본이 미국의 하와이 진주만을 기습 공격하면서 시작된 전쟁은?</span><span class="ans">→ 태평양 전쟁</span></button>
+        <button><span>3. 1944년 연합국이 프랑스 파리를 해방하는 계기가 된 작전은?</span><span class="ans">→ 노르망디 상륙 작전</span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 마무리 -->
+  <section class="slide" data-title="생각 넓히기">
+    <div class="inner">
+      <p class="kicker">생각 넓히기</p>
+      <p class="think">영국과 프랑스는 전쟁을 피하려고 독일의 영토 요구를 들어주었지만, 전쟁은 결국 일어났습니다.<br><b>전쟁을 막을 수 있는 순간은 언제였을까요? 나라면 어떤 선택을 했을까요?</b></p>
+      <div class="card">
+        <p class="kicker" style="margin-bottom:.4em">다음 시간</p>
+        제2차 세계 대전의 발발 ② — 전쟁의 결과와 피해 (교과서 195~197쪽)
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="nav">
+  <div class="timer" id="timer">
+    <span aria-hidden="true">⏱</span>
+    <span class="t-set"><button data-m="1">1분</button> <button data-m="3">3분</button> <button data-m="5">5분</button></span>
+    <output id="tOut"></output>
+    <button id="tStop" hidden>정지</button>
+  </div>
+  <span class="sp"></span>
+  <button class="btn ghost" id="prev">◀ 이전</button>
+  <span class="count" id="count"></span>
+  <button class="btn" id="next">다음 ▶</button>
+</footer>
+
+<script>
+(function(){
+  'use strict';
+  var $ = function(s, r){ return (r || document).querySelector(s); };
+  var $$ = function(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  function shuffle(a){ a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function el(tag, cls, text){ var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+  /* ---------- 슬라이드 이동 ---------- */
+  var slides = $$('.slide'), cur = 0;
+  var dots = $('#dots');
+  slides.forEach(function(s, i){
+    var b = el('button'); b.title = (i + 1) + '. ' + s.dataset.title; b.setAttribute('aria-label', b.title);
+    b.addEventListener('click', function(){ go(i); }); dots.appendChild(b);
+  });
+  function go(i){
+    cur = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach(function(s, k){ s.classList.toggle('on', k === cur); });
+    $$('button', dots).forEach(function(b, k){ b.classList.toggle('on', k === cur); b.classList.toggle('done', k < cur); });
+    $('#where').textContent = slides[cur].dataset.title;
+    $('#count').textContent = (cur + 1) + ' / ' + slides.length;
+    $('#prev').disabled = cur === 0; $('#next').disabled = cur === slides.length - 1;
+    slides[cur].scrollTop = 0;
+    try { history.replaceState(null, '', '#' + (cur + 1)); } catch (e) {}
+  }
+  function revealStep(){
+    var st = $('.step:not(.shown)', slides[cur]);
+    if (!st) return false;
+    st.classList.add('shown'); syncFlowBtn(); return true;
+  }
+  function next(){ if (!revealStep()) go(cur + 1); }
+  function prev(){ go(cur - 1); }
+  $('#next').addEventListener('click', next);
+  $('#prev').addEventListener('click', prev);
+  document.addEventListener('keydown', function(e){
+    if (e.ctrlKey || e.altKey || e.metaKey) return;
+    if (e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); next(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); prev(); }
+    else if (e.key === 'f' || e.key === 'F') {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
+    }
+  });
+
+  /* ---------- 뒤집기 · 빈칸 · 확인 문제 ---------- */
+  $$('.flip').forEach(function(b){ b.addEventListener('click', function(){ b.classList.toggle('open'); }); });
+  $$('.blank').forEach(function(b){ b.addEventListener('click', function(){ b.classList.toggle('open'); }); });
+  $$('.qa button').forEach(function(b){ b.addEventListener('click', function(){ b.classList.toggle('open'); }); });
+  $('#noteAll').addEventListener('click', function(){ $$('#note .blank').forEach(function(b){ b.classList.add('open'); }); });
+  $('#noteHide').addEventListener('click', function(){ $$('#note .blank').forEach(function(b){ b.classList.remove('open'); }); });
+
+  /* ---------- 생각 열기 ---------- */
+  $$('#poll .choice').forEach(function(b){
+    b.addEventListener('click', function(){
+      $$('#poll .choice').forEach(function(c){ c.classList.remove('wrong'); });
+      if (b.dataset.ok === '1') { b.classList.add('right'); $('#pollEx').classList.add('show'); }
+      else b.classList.add('wrong');
+    });
+  });
+
+  /* ---------- 발발 흐름 ---------- */
+  function syncFlowBtn(){ $('#flowBtn').disabled = !$('.flow .step:not(.shown)'); }
+  $('#flowBtn').addEventListener('click', revealStep);
+
+  /* ---------- 두 진영 ---------- */
+  var NATIONS = [['독일','axis'],['이탈리아','axis'],['일본','axis'],['영국','allied'],['프랑스','allied'],['미국','allied'],['소련','allied'],['중국','allied']];
+  var pool = $('#pool'), selected = null;
+  function buildBins(){
+    pool.innerHTML = ''; $$('.bin .pool').forEach(function(p){ p.innerHTML = ''; });
+    $('#binMsg').textContent = ''; $('#binMsg').className = 'msg'; selected = null;
+    shuffle(NATIONS).forEach(function(n){
+      var c = el('button', 'chip', n[0]); c.dataset.side = n[1];
+      c.addEventListener('click', function(ev){
+        ev.stopPropagation();
+        c.classList.remove('right', 'wrong');
+        if (c.parentNode !== pool) { pool.appendChild(c); return; }
+        if (selected) selected.classList.remove('sel');
+        selected = (selected === c) ? null : c;
+        if (selected) c.classList.add('sel');
+      });
+      pool.appendChild(c);
+    });
+  }
+  $$('.bin').forEach(function(bin){
+    function drop(){ if (!selected) return; selected.classList.remove('sel'); $('.pool', bin).appendChild(selected); selected = null; }
+    bin.addEventListener('click', drop);
+    bin.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); drop(); } });
+  });
+  $('#binCheck').addEventListener('click', function(){
+    var m = $('#binMsg');
+    if ($$('.chip', pool).length) { m.textContent = '아직 넣지 않은 나라가 있어요.'; m.className = 'msg no'; return; }
+    var wrong = 0;
+    $$('.bin').forEach(function(bin){ $$('.chip', bin).forEach(function(c){ var ok = c.dataset.side === bin.dataset.bin; c.classList.toggle('right', ok); c.classList.toggle('wrong', !ok); if (!ok) wrong++; }); });
+    if (wrong) { m.textContent = wrong + '개가 틀렸어요. 빨간 나라를 눌러 꺼낸 뒤 다시 넣어 보세요.'; m.className = 'msg no'; }
+    else { m.textContent = '정답! 추축국: 독일·이탈리아·일본 / 연합국: 영국·프랑스·미국·소련·중국 등'; m.className = 'msg ok'; }
+  });
+  $('#binReset').addEventListener('click', buildBins);
+  buildBins();
+
+  /* ---------- 연표 ---------- */
+  var TL = [
+    { y:1939, ax:72, phase:'전쟁의 시작', ev:[
+      ['eu','독일, 폴란드 침공','독소 불가침 조약을 맺은 뒤 폴란드를 기습 공격 → 영국·프랑스가 선전 포고',1] ] },
+    { y:1940, ax:84, phase:'추축국의 공세', ev:[
+      ['eu','독일, 파리 점령','프랑스 함락 → 드골이 영국으로 건너가 임시 정부를 세우고 저항',1],
+      ['eu','영국의 저항','총리 처칠을 중심으로 독일의 공격에 맞섬',0],
+      ['eu','이탈리아의 침략','그리스와 아프리카를 침략',0] ] },
+    { y:1941, ax:80, phase:'전쟁이 전 세계로 확산', ev:[
+      ['eu','독일, 소련 공격','독소 불가침 조약을 파기하고 소련을 침공',0],
+      ['pa','일본, 동남아시아 침략','지하자원을 확보하려고 침략 → 미국이 경제 봉쇄로 대응',0],
+      ['pa','일본, 하와이 진주만 기습','태평양 전쟁 시작 → 미국이 연합국으로 참전',1] ] },
+    { y:1942, ax:55, phase:'전세가 바뀌다', ev:[
+      ['pa','미드웨이 해전','미국이 일본을 격퇴',1],
+      ['eu','스탈린그라드 전투 (1942~1943)','소련이 독일을 격퇴',1] ] },
+    { y:1943, ax:40, phase:'연합국의 반격', ev:[
+      ['eu','이탈리아 항복','추축국 가운데 가장 먼저 연합국에 항복',0] ] },
+    { y:1944, ax:22, phase:'연합국의 반격', ev:[
+      ['eu','노르망디 상륙 작전','연합국이 프랑스 해안에 상륙 → 파리 해방',1] ] },
+    { y:1945, ax:0, phase:'전쟁의 종결', ev:[
+      ['eu','독일의 무조건 항복 (5월)','유럽에서의 전쟁이 끝남',0],
+      ['pa','원자 폭탄 투하 · 소련 참전 (8월)','미국이 일본 히로시마·나가사키에 원자 폭탄 투하, 소련이 대일전 참전',1],
+      ['pa','일본의 무조건 항복 (8월)','제2차 세계 대전 종결',1] ] }
+  ];
+  var yb = $('#yearsBar');
+  TL.forEach(function(t, i){ var b = el('button', '', String(t.y)); b.addEventListener('click', function(){ showYear(i); }); yb.appendChild(b); });
+  function showYear(i){
+    var t = TL[i];
+    $$('button', yb).forEach(function(b, k){ b.classList.toggle('on', k === i); });
+    $('#gAx').style.flexBasis = t.ax + '%';
+    $('#gAx').textContent = t.ax > 12 ? '추축국' : '';
+    $('#phase').textContent = t.y + '년 — ' + t.phase;
+    var box = $('#events'); box.innerHTML = '';
+    t.ev.forEach(function(e){
+      var d = el('div', 'ev ' + e[0] + (e[3] ? ' key' : ''));
+      d.appendChild(el('span', 'tag', e[0] === 'eu' ? '유럽' : '아시아·태평양'));
+      d.appendChild(el('h3', '', e[1])); d.appendChild(el('p', '', e[2])); box.appendChild(d);
+    });
+  }
+  showYear(0);
+
+  /* ---------- 순서 맞추기 ---------- */
+  var ORDER = [['독일의 폴란드 침공',1939],['독일의 파리 점령',1940],['일본의 하와이 진주만 기습',1941],['스탈린그라드 전투',1942],['노르망디 상륙 작전',1944],['일본에 원자 폭탄 투하',1945]];
+  var picks = [];
+  function buildOrder(){
+    var box = $('#order'); box.innerHTML = ''; box.classList.remove('checked'); picks = [];
+    $('#orderMsg').textContent = ''; $('#orderMsg').className = 'msg';
+    var arr; do { arr = shuffle(ORDER.map(function(o, i){ return i; })); } while (arr.every(function(v, i){ return v === i; }));
+    arr.forEach(function(idx){
+      var c = el('button', 'ocard'); c.dataset.idx = idx;
+      c.appendChild(el('span', 'n', '')); c.appendChild(document.createTextNode(ORDER[idx][0]));
+      c.appendChild(el('small', '', ORDER[idx][1] + '년'));
+      c.addEventListener('click', function(){
+        box.classList.remove('checked');
+        var p = picks.indexOf(c);
+        if (p >= 0) picks.splice(p, 1); else picks.push(c);
+        paintOrder();
+      });
+      box.appendChild(c);
+    });
+  }
+  function paintOrder(){
+    $$('#order .ocard').forEach(function(c){ var p = picks.indexOf(c); c.classList.remove('right', 'wrong'); c.classList.toggle('picked', p >= 0); $('.n', c).textContent = p >= 0 ? p + 1 : ''; });
+  }
+  $('#orderCheck').addEventListener('click', function(){
+    var m = $('#orderMsg');
+    if (picks.length < ORDER.length) { m.textContent = '여섯 장을 모두 눌러 순서를 정해 주세요.'; m.className = 'msg no'; return; }
+    var wrong = 0;
+    picks.forEach(function(c, i){ var ok = Number(c.dataset.idx) === i; c.classList.add(ok ? 'right' : 'wrong'); if (!ok) wrong++; });
+    $('#order').classList.add('checked');
+    if (wrong) { m.textContent = wrong + '장의 순서가 달라요. 연도를 보고 다시 눌러 고쳐 보세요.'; m.className = 'msg no'; }
+    else { m.textContent = '정답! 폴란드 침공 → 파리 점령 → 진주만 기습 → 스탈린그라드 → 노르망디 → 원자 폭탄'; m.className = 'msg ok'; }
+  });
+  $('#orderReset').addEventListener('click', buildOrder);
+  buildOrder();
+
+  /* ---------- O/X ---------- */
+  var OX = [
+    ['독일이 폴란드를 침공하면서 제2차 세계 대전이 시작되었다.', true, '1939년 독일의 폴란드 기습 공격으로 전쟁이 시작되었습니다.'],
+    ['독일은 폴란드를 침공하기 전에 영국과 불가침 조약을 맺었다.', false, '독일이 불가침 조약을 맺은 나라는 소련입니다. (독소 불가침 조약)'],
+    ['파리가 함락되자 처칠은 영국으로 건너가 임시 정부를 세웠다.', false, '영국으로 건너가 저항한 프랑스 인물은 드골입니다. 처칠은 영국의 총리입니다.'],
+    ['일본이 하와이 진주만을 기습 공격하면서 태평양 전쟁이 시작되었다.', true, '1941년 진주만 기습을 계기로 미국이 연합국으로 참전하였습니다.'],
+    ['스탈린그라드 전투에서 독일이 소련을 격퇴하였다.', false, '소련이 독일을 격퇴하였고, 이후 전세가 연합국 쪽으로 기울었습니다.'],
+    ['노르망디 상륙 작전이 성공해 프랑스 파리가 해방되었다.', true, '1944년 연합국은 노르망디에 상륙한 뒤 파리를 해방하였습니다.'],
+    ['제2차 세계 대전에서 일본은 독일보다 먼저 항복하였다.', false, '1945년 5월 독일이 먼저 항복하였고, 8월에 일본이 항복하면서 전쟁이 끝났습니다.']
+  ];
+  var oxI = 0, oxRight = 0, oxDone = false;
+  function showOx(){
+    oxDone = false;
+    $('#oxNo').textContent = '(' + (oxI + 1) + ' / ' + OX.length + ')';
+    $('#oxQ').textContent = OX[oxI][0];
+    $('#oxFb').className = 'card ox-fb'; $('#oxFb').textContent = '';
+    $('#oxO').classList.remove('picked'); $('#oxX').classList.remove('picked');
+    $('#oxNext').disabled = true; $('#oxNext').textContent = oxI === OX.length - 1 ? '결과 보기' : '다음 문제 ▶';
+    $('#oxScore').textContent = '';
+  }
+  function answerOx(val, btn){
+    if (oxDone) return; oxDone = true;
+    var q = OX[oxI], ok = q[1] === val; if (ok) oxRight++;
+    btn.classList.add('picked');
+    var fb = $('#oxFb'); fb.className = 'card ox-fb show ' + (ok ? 'ok' : 'no');
+    fb.textContent = (ok ? '정답! ' : '아쉬워요. ') + '답은 ' + (q[1] ? 'O' : 'X') + ' — ' + q[2];
+    $('#oxNext').disabled = false;
+  }
+  $('#oxO').addEventListener('click', function(){ answerOx(true, this); });
+  $('#oxX').addEventListener('click', function(){ answerOx(false, this); });
+  $('#oxNext').addEventListener('click', function(){
+    if (oxI === -1) { oxI = 0; oxRight = 0; showOx(); return; }
+    if (oxI < OX.length - 1) { oxI++; showOx(); return; }
+    $('#oxQ').textContent = OX.length + '문제 중 ' + oxRight + '문제를 맞혔습니다!';
+    $('#oxNo').textContent = '(결과)';
+    $('#oxFb').className = 'card ox-fb';
+    $('#oxNext').textContent = '처음부터 다시'; oxI = -1; oxDone = true;
+  });
+  showOx();
+
+  /* ---------- 타이머 ---------- */
+  var tId = null, tLeft = 0, tBox = $('#timer'), tOut = $('#tOut'), tStop = $('#tStop');
+  function fmt(s){ return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
+  function stopTimer(clear){ clearInterval(tId); tId = null; tStop.hidden = true; if (clear) { tOut.textContent = ''; tBox.classList.remove('end'); } }
+  $$('#timer [data-m]').forEach(function(b){
+    b.addEventListener('click', function(){
+      stopTimer(true); tLeft = Number(b.dataset.m) * 60; tOut.textContent = fmt(tLeft); tStop.hidden = false;
+      tId = setInterval(function(){
+        tLeft--; tOut.textContent = fmt(Math.max(0, tLeft));
+        if (tLeft <= 0) { stopTimer(false); tStop.hidden = false; tOut.textContent = '시간 끝!'; tBox.classList.add('end'); }
+      }, 1000);
+    });
+  });
+  tStop.addEventListener('click', function(){ stopTimer(true); });
+
+  /* ---------- 시작 ---------- */
+  var h = parseInt(location.hash.slice(1), 10);
+  go(h >= 1 && h <= slides.length ? h - 1 : 0);
+  syncFlowBtn();
+})();
+</script>
+</body>
+</html>
